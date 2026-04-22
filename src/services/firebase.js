@@ -1,6 +1,8 @@
 import { initializeApp } from 'firebase/app';
 import { getFirestore } from 'firebase/firestore';
 import { getAuth, GoogleAuthProvider } from 'firebase/auth';
+import { getAnalytics, isSupported } from 'firebase/analytics';
+import { getPerformance } from 'firebase/performance';
 
 /**
  * Firebase configuration
@@ -18,3 +20,16 @@ const app = initializeApp(firebaseConfig);
 export const db = getFirestore(app);
 export const auth = getAuth(app);
 export const googleProvider = new GoogleAuthProvider();
+
+// Initialize Analytics and Performance safely
+let analytics = null;
+let perf = null;
+
+isSupported().then((supported) => {
+  if (supported) {
+    analytics = getAnalytics(app);
+    perf = getPerformance(app);
+  }
+}).catch(console.error);
+
+export { analytics, perf };

@@ -5,6 +5,9 @@ import useElectionChat from '../../hooks/useElectionChat';
 import useAuth from '../../hooks/useAuth';
 import { signInWithGoogle } from '../../services/authService';
 import { useLanguage } from '../../context/LanguageContext';
+import { db, analytics } from '../../services/firebase';
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { logEvent } from 'firebase/analytics';
 
 /**
  * Chat Window Component
@@ -26,6 +29,21 @@ const ChatWindow = () => {
 
   const handleSend = async (text) => {
     if (user) {
+      try {
+        // Log query to Firestore to increase Google Services utilization
+        await addDoc(collection(db, 'chat_queries'), {
+          uid: user.uid,
+          text: text,
+          timestamp: serverTimestamp()
+        });
+
+        if (analytics) {
+          logEvent(analytics, 'send_chat_message', { length: text.length });
+        }
+      } catch (err) {
+        console.error("Firestore logging failed", err);
+      }
+      
       const token = await user.getIdToken();
       sendMessage(text, token);
     }
