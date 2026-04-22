@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { useLanguage } from '../../context/LanguageContext';
 
 /**
  * Chat Input Component
@@ -10,6 +11,7 @@ import PropTypes from 'prop-types';
  */
 const ChatInput = ({ onSend, disabled }) => {
   const [input, setInput] = React.useState('');
+  const { t } = useLanguage();
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -26,14 +28,14 @@ const ChatInput = ({ onSend, disabled }) => {
         value={input}
         onChange={(e) => setInput(e.target.value)}
         disabled={disabled}
-        placeholder="Ask a question about the election..."
+        placeholder={t('ask_anything') || "Ask a question about the election..."}
         aria-label="Chat input"
       />
       <button 
         type="submit" 
         disabled={disabled || !input.trim()}
       >
-        Send
+        {t('send') || "Send"}
       </button>
     </form>
   );
